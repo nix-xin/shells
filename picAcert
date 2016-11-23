@@ -1,0 +1,104 @@
+#!/bin/ksh
+
+# This script will assist WebAdmins in maintaining
+# all DISA DoD CA Certs up to date.
+# FNMOC Uses CA Cert to provide systems that depend on SSL
+# certificates for peer identification.
+# Author: Luciano Avendano
+# Date: 06/15/2015
+
+# Our Global Vars
+DISA="crl.gds.disa.mil" # hopefully this URL never changes
+BUNDLE="dod-ca-bundle.crt" # make sure this file is located in this directory 
+INDEX="index.html" # This file is fetched from DISA, it contains the list of CAs
+CATXT="caList.txt" # This is the cleaned up list of of all CAs, we build an array with this
+
+echo
+echo "--Creating menu select for current active CA certificates--"
+echo "--Contacting https://$DISA for latest Certs-- "
+echo
+
+# Use wget to fetch index page.
+ wget --no-check-certificate --quiet https://$DISA/
+
+# Use sed to strip out all CAs from index.html
+ sed -ne '/CN=DOD/,/<\/select>/p' $INDEX | sed 's/<[^>]\+>//g' | sed 's/^ *//; s/ *$//; /^$/d; /^\s*$/d; s/\s/+/g' > $CATXT
+
+# Use the cleaned up caList.txt file to build an array of CAs
+ set -A myCA `cat $CATXT`
+
+# PS3 is an environment variable
+# that sets the menu prompt
+
+PS3="Select a CA: "
+
+# The select command creates the menu
+i=0
+
+select CHOICE in `cat $CATXT` Quit
+do
+  if [[ -n $CHOICE ]]; then
+                CA=${myCA[REPLY-1]}
+                print "$CA"
+                
+                # If choice is to Quit, then exit script
+                if [[ $CHOICE == "Quit" ]]; then
+                   echo "Exiting...Good Bye!"
+                   exit 1
+                fi
+             
+                if [[ $CHOICE == "SYMANTEC+CLIENT+ECA+-+G4" ]]; then
+                   CHOICE="SYMANTEC+CLIENT+EXTERNAL+CERTIFICATION+AUTHORITY+-+G4"
+                   
+                fi
+                 
+                # If user selects wrong cert, catch that here
+                print "Are you sure you want to download $CHOICE ? [y/n]"
+                read ANS
+                if [[ $ANS == "n" ]]; then
+                   echo "Exiting..."
+                   exit 1
+                fi
+
+                # Fetch the cert using cURL and output to .cer file
+                echo "...Fetching $CHOICE from $DISA"
+                curl -s -k https://$DISA/getsign?$CHOICE -o $CHOICE.cer
+
+                # Use openssl to convert to .pem file
+                openssl x509 -inform der -in "$CHOICE.cer"  -out "$CHOICE.pem"
+                echo "Created $CHOICE.pem..."
+                echo
+                # Ask user if they would like to verify the new certificate
+                print "Would you like to verify $CHOICE.pem ? [y/n]"
+                read ANS
+                if [[ $ANS == "y" ]]; then
+                   openssl x509 -in $CHOICE.pem -text -noout
+                   
+                else
+                   continue
+                fi
+          
+                # Ask user if they would like to append to dod-ca-bundle file
+                print "Would you like to append $CHOICE.pem $BUNDLE ? [y/n]"
+                read ANS
+                if [[ $ANS == "n" ]]; then
+                   echo "Exiting..."
+                   exit 1
+                fi
+                # If user answered yes from above, then cat .pem file to bundle
+                echo "...Adding $CHOICE to $BUNDLE"
+                cat $CHOICE.pem >> $BUNDLE
+                echo "$CHOICE added to bundle !!"
+                
+                # Clean up working directory and exit.
+                echo "Cleaning up working directory..."
+                rm $INDEX $CATXT $CHOICE.cer $CHOICE.pem
+                echo "Done!" 
+      
+
+                echo                
+                break
+  fi
+  exit
+done
+
