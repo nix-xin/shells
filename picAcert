@@ -2,7 +2,7 @@
 
 # This script will assist WebAdmins in maintaining
 # all DISA DoD CA Certs up to date.
-# FNMOC Uses CA Cert to provide systems that depend on SSL
+# Orgs use CA Certs to provide systems that depend on SSL
 # certificates for peer identification.
 # Author: Luciano Avendano
 # Date: 06/15/2015
