@@ -10,4 +10,14 @@ I wrote this script attempting to automate a curl request to 20 seperate web ser
 ### pyFuzz
 Yes, I know. It's not really a shell script. I didnt want to create a seperate repo for python scripts. This at least keeps it consistent with the purpose of the "shells" repo. This script is a good template for fuzzing potentially vulnerable servers/services. All you need to do is add the TARGET_IP, PORT, and PARAM to be fuzzed. Think of vulnserver.exe if you've ever practiced a BoF example.
 
+### clr_da_logs
+This is a quick n dirty script for clearing your footprints. Be completely sure that you are "cleared" to run this script.
 
+### dns_enumeration
+A small collection of DNS forward, reverse lookups and zone transfer examples.
+
+### ip_tables
+A simple script that helps you monitor your network traffic using IP Tables.
+
+### smtp_enumeration
+Another python script that could be helpful in enumerating smtp servers for valid user names.
