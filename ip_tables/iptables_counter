@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#set -x
+
+# Use this script to measure the bandwidth when nampping a host.
+# then use iptables -vn -L to see the iptables with metrics
+
+if [ -z "$1" ]
+  then
+    echo "Usage: $0 <ip_address>"
+    exit 0
+fi
+
+#MYIP=$(ifconfig tap0 | grep "inet" | grep -v "inet6" | cut -d" " -f10)
+
+#reset all counters and iptables rules
+iptables -Z && iptables -F
+
+# measure incoming traffic to ip
+iptables -I INPUT 1 -s $1 -j ACCEPT
+
+#measure outgoing traffic to ip
+iptables -I OUTPUT 1 -d $1 -j ACCEPT
