@@ -1,0 +1,8 @@
+# Renaming your file extensions from .foo to .bar
+# *.txt is a globbing pattern, using * as a wildcard to match any string. *.txt matches all filenames ending with '.txt'.
+# -- marks the end of the option list. This avoids issues with filenames starting with hyphens.
+# ${f%.txt} is a parameter expansion, replaced by the value of the f variable with .txt removed from the end.
+
+for f in *.foo; do 
+    mv -- "$f" "${f%.foo}.bar"
+done
